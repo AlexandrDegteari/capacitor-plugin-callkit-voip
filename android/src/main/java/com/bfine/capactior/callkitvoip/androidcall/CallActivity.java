@@ -32,7 +32,7 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 
 import com.bfine.capactior.callkitvoip.CallKitVoipPlugin;
-import com.bfine.capactior.callkitvoip.R;
+import sa.ihorizon.callkitvoip.R;
 import com.bfine.capactior.callkitvoip.androidcall.util.CameraCapturerCompat;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;

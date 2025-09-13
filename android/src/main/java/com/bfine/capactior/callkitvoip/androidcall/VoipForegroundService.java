@@ -18,7 +18,7 @@ import android.util.Log;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 
-import com.bfine.capactior.callkitvoip.R;
+import sa.ihorizon.callkitvoip.R;
 
 import java.util.Objects;
 
@@ -133,7 +133,8 @@ public class VoipForegroundService extends Service {
             {
                 vibrator.vibrate(pattern, 0);
             }
-            Uri sound = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.call);
+            // Uri sound = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.call);
+            Uri sound = null; // TODO: Add call sound resource
             try
             {
                 ringtone.setDataSource(getApplicationContext(), sound);

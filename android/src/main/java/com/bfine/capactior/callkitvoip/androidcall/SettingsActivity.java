@@ -12,7 +12,7 @@ import androidx.preference.EditTextPreference;
 import androidx.preference.ListPreference;
 import androidx.preference.PreferenceFragmentCompat;
 
-import com.bfine.capactior.callkitvoip.R;
+import sa.ihorizon.callkitvoip.R;
 import com.twilio.video.AudioCodec;
 import com.twilio.video.G722Codec;
 import com.twilio.video.H264Codec;

@@ -49,6 +49,7 @@ android {
 repositories {
     google()
     mavenCentral()
+    maven { url 'https://jitpack.io' }
 }
 
 dependencies {
@@ -58,9 +59,12 @@ dependencies {
     implementation 'com.google.android.material:material:1.9.0'
     implementation 'com.google.android.gms:play-services-tasks:18.1.0'
     implementation 'com.google.firebase:firebase-messaging:23.2.1'
-    implementation 'com.getcapacitor:push-notifications:7.0.0'
+    // Removed com.getcapacitor:push-notifications dependency - using Firebase directly
     testImplementation "junit:junit:$junitVersion"
     androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
     androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
     implementation 'com.twilio:video-android:7.0.1'
+    implementation 'com.twilio:audioswitch:1.1.8'
+    implementation 'com.squareup.okhttp3:okhttp:4.11.0'
+    implementation 'androidx.preference:preference:1.2.1'
 }

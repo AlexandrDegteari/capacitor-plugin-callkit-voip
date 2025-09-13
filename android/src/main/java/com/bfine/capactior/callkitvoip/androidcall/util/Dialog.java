@@ -7,7 +7,7 @@ import android.widget.EditText;
 
 import androidx.appcompat.app.AlertDialog;
 
-import com.bfine.capactior.callkitvoip.R;
+import sa.ihorizon.callkitvoip.R;
 
 public class Dialog {
 
