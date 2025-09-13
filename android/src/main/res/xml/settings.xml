@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory android:title="Audio">
+        <ListPreference
+            android:key="pref_audio_codec"
+            android:title="Audio Codec"
+            android:summary="Select audio codec"
+            android:defaultValue="OPUS" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Video">
+        <ListPreference
+            android:key="pref_video_codec"
+            android:title="Video Codec"
+            android:summary="Select video codec"
+            android:defaultValue="VP8" />
+
+        <CheckBoxPreference
+            android:key="pref_vp8_simulcast"
+            android:title="VP8 Simulcast"
+            android:summary="Enable VP8 simulcast"
+            android:defaultValue="false" />
+
+        <CheckBoxPreference
+            android:key="pref_enable_automatic_subscription"
+            android:title="Automatic Subscription"
+            android:summary="Automatically subscribe to tracks"
+            android:defaultValue="true" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Bandwidth">
+        <EditTextPreference
+            android:key="pref_sender_max_audio_bitrate"
+            android:title="Max Audio Bitrate"
+            android:summary="Maximum audio bitrate in kbps"
+            android:defaultValue="0"
+            android:inputType="number" />
+
+        <EditTextPreference
+            android:key="pref_sender_max_video_bitrate"
+            android:title="Max Video Bitrate"
+            android:summary="Maximum video bitrate in kbps"
+            android:defaultValue="0"
+            android:inputType="number" />
+    </PreferenceCategory>
+
+</PreferenceScreen>
