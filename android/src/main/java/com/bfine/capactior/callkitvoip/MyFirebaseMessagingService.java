@@ -52,6 +52,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         if (remoteMessage.getData().containsKey("type") && remoteMessage.getData().get("type").equals("stopCall")) {
 
         }
+    }
 
     private boolean isServiceRunning(String service_name) {
         ActivityManager manager = (ActivityManager) getApplicationContext().getSystemService(getApplicationContext().ACTIVITY_SERVICE);
