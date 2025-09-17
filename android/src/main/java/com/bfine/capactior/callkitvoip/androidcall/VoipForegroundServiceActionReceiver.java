@@ -33,45 +33,55 @@ public class VoipForegroundServiceActionReceiver  extends BroadcastReceiver {
     private void performClickAction(Context context, String action,String token,String roomName,String username) {
         Log.d("performClickAction","action "+action + "   "+username);
 
+        CallKitVoipPlugin plugin = CallKitVoipPlugin.getInstance();
+
         if (action.equals("RECEIVE_CALL")) {
+            // Answer call from notification
+            if (plugin != null) {
+                plugin.notifyCallAnswered(username, roomName);
+            }
 
-            Intent dialogIntent = new Intent(context, CallActivity.class);
-            dialogIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            dialogIntent.putExtra("auto_answer",true);
-            dialogIntent.putExtra("token",token);
-            dialogIntent.putExtra("roomName",roomName);
-            dialogIntent.putExtra("username",username);
+            // Open main activity to show call UI
+            Class<?> mainActivityClass = CallKitVoipPlugin.getMainActivityClass();
+            if (mainActivityClass != null) {
+                Intent dialogIntent = new Intent(context, mainActivityClass);
+                dialogIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                dialogIntent.putExtra("call_action", "answer");
+                dialogIntent.putExtra("token", token);
+                dialogIntent.putExtra("roomName", roomName);
+                dialogIntent.putExtra("username", username);
+                context.startActivity(dialogIntent);
+            }
 
-            context.startActivity(dialogIntent);
+            // Stop the foreground service
+            context.stopService(new Intent(context, VoipForegroundService.class));
         }
         else if (action.equals("FULLSCREEN_CALL")) {
-
-
-            Intent dialogIntent = new Intent(context, CallActivity.class);
-
-            dialogIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            dialogIntent.putExtra("auto_answer",false);
-            dialogIntent.putExtra("token",token);
-            dialogIntent.putExtra("roomName",roomName);
-            dialogIntent.putExtra("username",username);
-
-            context.startActivity(dialogIntent);
+            // Open main activity to show incoming call UI
+            Class<?> mainActivityClass = CallKitVoipPlugin.getMainActivityClass();
+            if (mainActivityClass != null) {
+                Intent dialogIntent = new Intent(context, mainActivityClass);
+                dialogIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                dialogIntent.putExtra("call_action", "incoming");
+                dialogIntent.putExtra("token", token);
+                dialogIntent.putExtra("roomName", roomName);
+                dialogIntent.putExtra("username", username);
+                context.startActivity(dialogIntent);
+            }
         }
         else if (action.equals("CANCEL_CALL")) {
+            // Reject call
+            if (plugin != null) {
+                plugin.notifyCallRejected(username, roomName);
+            }
+
+            // Stop the foreground service
             context.stopService(new Intent(context, VoipForegroundService.class));
+
+            // Close notification drawer
             Intent it = new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
             context.sendBroadcast(it);
-            end_call(username,roomName);
-
         }
-    }
-
-    public void end_call( String username,String connectionId)
-    {
-        CallKitVoipPlugin instance = CallKitVoipPlugin.getInstance();
-        instance.notifyEvent("RejectCall",username,connectionId);
-
-
     }
 
 }

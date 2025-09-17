@@ -10,6 +10,7 @@ import android.util.Log;
 import androidx.annotation.RequiresApi;
 
 import com.bfine.capactior.callkitvoip.androidcall.VoipBackgroundService;
+import com.bfine.capactior.callkitvoip.androidcall.VoipForegroundService;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
@@ -65,27 +66,30 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     }
 
     public void show_call_notification(String connectionId, String username) {
-        Intent voip_service = new Intent(getApplicationContext(), VoipBackgroundService.class);
+        // Start foreground service with main activity
+        Intent voip_service = new Intent(getApplicationContext(), VoipForegroundService.class);
+        voip_service.setAction("incoming");
         voip_service.putExtra("connectionId", connectionId);
         voip_service.putExtra("username", username);
-        Log.d("show_call_notification", "called");
 
-        if (!isServiceRunning("com.bfine.capactior.callkitvoip.androidcall.VoipBackgroundService")) {
-            try {
-                getApplicationContext().startService(voip_service);
-            } catch (Exception e) {
-            }
+        // Get token and room name from the message data if available
+        // These will be needed for WebRTC connection
+        voip_service.putExtra("token", ""); // Will be filled from push data
+        voip_service.putExtra("roomName", ""); // Will be filled from push data
+
+        Log.d("show_call_notification", "Starting foreground service for incoming call from: " + username);
+
+        // Start foreground service
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            getApplicationContext().startForegroundService(voip_service);
         } else {
-            try {
-                getApplicationContext().stopService(voip_service);
-            } catch (Exception e) {
-            }
-            try {
-                getApplicationContext().startService(voip_service);
-            } catch (Exception e) {
-                Log.d("sip_call_init", e.toString());
-            }
+            getApplicationContext().startService(voip_service);
         }
 
+        // Notify the plugin about incoming call
+        CallKitVoipPlugin plugin = CallKitVoipPlugin.getInstance();
+        if (plugin != null) {
+            plugin.notifyIncomingCall(username, connectionId, "", "");
+        }
     }
 }

@@ -12,19 +12,9 @@
     <application
         android:usesCleartextTraffic="true"
         >
-        <activity
-            android:name=".androidcall.CallActivity"
-            android:label="@string/app_name"
-            android:launchMode="singleTop"
-            android:configChanges="locale"
-            android:exported="true"
-            android:turnScreenOn="true"
-            android:autoRemoveFromRecents="true"
-            android:showWhenLocked="true"
-            android:windowSoftInputMode="adjustResize|stateHidden"
-            android:screenOrientation="portrait"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
-        <service android:name="sa.ihorizon.public.callkitvoip.MyConnectionService"
+        <!-- CallActivity removed - using main Capacitor activity instead -->
+
+        <service android:name="com.bfine.capactior.callkitvoip.MyConnectionService"
             android:permission="android.permission.BIND_TELECOM_CONNECTION_SERVICE"
             android:exported="false">
             <intent-filter>
@@ -32,23 +22,22 @@
             </intent-filter>
         </service>
         <service
-            android:name="sa.ihorizon.public.callkitvoip.androidcall.VoipForegroundService"
+            android:name="com.bfine.capactior.callkitvoip.androidcall.VoipForegroundService"
             android:enabled="true"
             android:stopWithTask="true"
-            android:exported="true"></service>
+            android:exported="false"></service>
         <receiver
-            android:name="sa.ihorizon.public.callkitvoip.androidcall.VoipForegroundServiceActionReceiver"
+            android:name="com.bfine.capactior.callkitvoip.androidcall.VoipForegroundServiceActionReceiver"
             android:exported="false">
         </receiver>
         <service
-            android:name="sa.ihorizon.public.callkitvoip.androidcall.VoipBackgroundService"
+            android:name="com.bfine.capactior.callkitvoip.androidcall.VoipBackgroundService"
             android:enabled="true"
             android:exported="false"
             android:stopWithTask="true">
-
         </service>
         <service
-            android:name="sa.ihorizon.public.callkitvoip.MyFirebaseMessagingService"
+            android:name="com.bfine.capactior.callkitvoip.MyFirebaseMessagingService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
