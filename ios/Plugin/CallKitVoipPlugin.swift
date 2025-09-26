@@ -29,7 +29,19 @@ public class CallKitVoipPlugin: CAPPlugin {
         call.resolve()
     }
 
-    public func notifyEvent(eventName: String, uuid: UUID){
+    @objc func endActiveCall(_ call: CAPPluginCall) {
+        // End any active calls
+        print("Ending active calls from JavaScript")
+
+        // Find and end all active calls
+        for (uuid, _) in connectionIdRegistry {
+            endCall(uuid: uuid)
+        }
+
+        call.resolve()
+    }
+
+    public func notifyEvent(eventName: String, uuid: UUID, clearConfig: Bool = false){
         if let config = connectionIdRegistry[uuid] {
             notifyListeners(eventName, data: [
                 "id": config.id,
@@ -37,7 +49,10 @@ public class CallKitVoipPlugin: CAPPlugin {
                 "name"    : config.name,
                 "duration"    : config.duration,
             ])
-            connectionIdRegistry[uuid] = nil
+            // Only clear the config if explicitly requested (e.g., when call ends)
+            if clearConfig {
+                connectionIdRegistry[uuid] = nil
+            }
         }
     }
 
@@ -78,15 +93,59 @@ extension CallKitVoipPlugin: CXProviderDelegate {
     public func provider(_ provider: CXProvider, perform action: CXAnswerCallAction) {
         // Answers an incoming call
         print("CXAnswerCallAction answers an incoming call")
-        notifyEvent(eventName: "callAnswered", uuid: action.callUUID)
-        endCall(uuid: action.callUUID)
+
+        // ВАЖНО: Сообщаем CallKit что звонок подключился - это скрывает CallKit UI
+        provider.reportCall(with: action.callUUID, connectedAt: Date())
+        print("📞 iOS CallKit: Reported call as connected - CallKit UI should be hidden")
+
+        // Try to bring app to foreground using various methods
+        DispatchQueue.main.async {
+            // Method 1: Make window key and visible (works if app is backgrounded)
+            if let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+               let window = scene.windows.first {
+                window.makeKeyAndVisible()
+                print("📱 iOS: Making window key and visible")
+            }
+
+            // Method 2: Request scene activation (iOS 13+)
+            if #available(iOS 13.0, *) {
+                if let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
+                    UIApplication.shared.requestSceneSessionActivation(
+                        scene.session,
+                        userActivity: nil,
+                        options: nil,
+                        errorHandler: { error in
+                            print("❌ Error activating scene: \(error)")
+                        }
+                    )
+                    print("📱 iOS: Requested scene activation")
+                }
+            }
+
+            // Method 3: Try to open app using URL scheme (fallback)
+            if let url = URL(string: "soulmates://call-accepted") {
+                UIApplication.shared.open(url, options: [:]) { success in
+                    print("📱 iOS: URL scheme open success: \(success)")
+                }
+            }
+        }
+
+        // Notify the app that the call was answered (с небольшой задержкой чтобы CallKit UI успел скрыться)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            self.notifyEvent(eventName: "callAnswered", uuid: action.callUUID)
+            print("📞 iOS CallKit: Notified app about call answer")
+        }
+
+        // Mark the action as fulfilled - this tells CallKit the call was accepted
         action.fulfill()
+
+        print("📞 iOS CallKit: Call answered, connected, and app activation attempted")
     }
 
     public func provider(_ provider: CXProvider, perform action: CXEndCallAction) {
         // End the call
         print("CXEndCallAction represents ending call")
-        notifyEvent(eventName: "callEnded", uuid: action.callUUID)
+        notifyEvent(eventName: "callEnded", uuid: action.callUUID, clearConfig: true)
         action.fulfill()
     }
 
