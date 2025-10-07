@@ -181,7 +181,21 @@ extension CallKitVoipPlugin: PKPushRegistryDelegate {
          print("name: \(name)")
          print("media: \(media)")
          print("duration: \(duration)")
+
+        // КРИТИЧНО: iOS требует немедленного показа CallKit UI, иначе крашит приложение!
+        // Сначала показываем CallKit UI (обязательно!)
         self.incomingCall(id: id, media: media, name: name, duration: duration)
+        print("📞 iOS: CallKit UI shown immediately (required by iOS)")
+
+        // Затем уведомляем JavaScript о входящем VoIP push
+        // Это даёт JavaScript возможность подключить WebSocket пока пользователь смотрит на CallKit UI
+        notifyListeners("incomingCall", data: [
+            "id": id,
+            "media": media,
+            "name": name,
+            "duration": duration
+        ])
+        print("📞 iOS: Notified JavaScript about incoming VoIP push")
     }
 
 }
